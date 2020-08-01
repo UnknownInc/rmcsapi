@@ -1,0 +1,152 @@
+openapi: 3.0.1
+info:
+  title: RMCS API
+  description: This is the API specification for RMCS.
+  termsOfService: https://api.rmcloudsoftware.com/terms/
+  contact:
+    email: rakesh@rareminds.in
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://api.rmcloudsoftware.com/v1
+paths:
+  /{itemId}/likes:
+    get:
+      tags:
+      - item
+      summary: Gets the count of the likes for the itemId
+      operationId: getLikes
+      parameters:
+      - name: itemId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successfully retrived the count of likes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "404":
+          description: Invalid itemId
+        "500":
+          description: Internal sever error
+      x-swagger-router-controller: Item
+    post:
+      tags:
+      - item
+      summary: Update by Incrementing or Decrementing the count of the likes for the
+        itemId
+      operationId: updateLikes
+      parameters:
+      - name: itemId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+      responses:
+        "200":
+          description: successfully added to the count of likes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "403":
+          description: Access denied
+        "404":
+          description: Invalid itemId/op
+        "500":
+          description: Internal sever error
+      x-swagger-router-controller: Item
+components:
+  schemas:
+    Context:
+      type: object
+      properties:
+        userhash:
+          type: integer
+          format: string
+      xml:
+        name: Context
+    EmailCredentials:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    User:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        password:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+      xml:
+        name: Use
+    inline_response_200:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: count of the likes.
+          example: 1234
+      example:
+        count: 1234
+    body:
+      type: object
+      properties:
+        op:
+          type: string
+          enum:
+          - inc
+          - dec
+          - reset
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    NotFoundError:
+      description: Unable to reach/find the requested resource
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

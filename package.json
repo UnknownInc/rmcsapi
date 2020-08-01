@@ -1,0 +1,40 @@
+{
+  "name": "rmcs-api",
+  "version": "1.0.0",
+  "description": "This is the API specification for RMCS.",
+  "main": "index.js",
+  "scripts": {
+    "dockerbuild": "docker build -t gcr.io/$PROJECT_ID/rmcsapi:latest .",
+    "dockerpush": "docker push gcr.io/$PROJECT_ID/rmcsapi:latest",
+    "prestart": "npm install",
+    "dev": "DEBUG=rmcs:* nodemon -w 'src/**/*' -r dotenv/config --exec babel-node src/server.js",
+    "build": "babel src -d build && cp -r src/api build/",
+    "start": "node build/server.js"
+  },
+  "keywords": [
+    "openapi3"
+  ],
+  "license": "Unlicense",
+  "private": true,
+  "dependencies": {
+    "uuid": "^8.3.0",
+    "connect": "^3.7.0",
+    "js-yaml": "^3.14.0",
+    "oas3-tools": "^2.0.2",
+    "cors": "^2.8.5",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
+    "firebase": "^7.17.1",
+    "firebase-admin": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
+    "@babel/node": "^7.10.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "dotenv": "^8.2.0"
+  }
+}
