@@ -27,7 +27,7 @@ class ExpressServer {
 
   setupMiddleware() {
     // this.setupAllowedMedia();
-    this.app.set('trust proxy', '127.0.0.1');
+    this.app.set('trust proxy', true);
     this.app.use(express.static('public'))
     this.app.use(cors());
     this.app.use(bodyParser.json({ limit: '14MB' }));

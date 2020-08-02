@@ -128,7 +128,13 @@ class Controller {
 
   static async handleRequest(request, response, serviceOperation) {
     try {
-      const serviceResponse = await serviceOperation(this.collectRequestParams(request));
+      const serviceResponse = await serviceOperation({
+        requestinfo:{
+          ip: request.ip,
+          ua: request.headers["user-agent"],
+        },
+        ...this.collectRequestParams(request)
+      });
       Controller.sendResponse(response, serviceResponse);
     } catch (error) {
       Controller.sendError(response, error);
