@@ -4,12 +4,13 @@
   "description": "This is the API specification for RMCS.",
   "main": "index.js",
   "scripts": {
+    "generate": "openapi-generator generate -i api/openapi.yaml -g typescript-angular -o generated-sources/openapi --additional-properties=ngVersion=6.1.7,npmName=restClient,supportsES6=true,npmVersion=6.9.0,withInterfaces=true",
     "dockerbuild": "docker build -t gcr.io/$PROJECT_ID/rmcsapi:latest .",
     "dockerpush": "docker push gcr.io/$PROJECT_ID/rmcsapi:latest",
     "prestart": "npm install",
-    "dev": "DEBUG=rmcs:* nodemon -w 'src/**/*' -r dotenv/config --exec babel-node src/server.js",
+    "dev": "DEBUG=rmcs:* nodemon -w 'src/**/*' -r dotenv/config --exec babel-node src/index.js",
     "build": "babel src -d build && cp -r src/api build/",
-    "start": "node build/server.js"
+    "start": "node build/index.js"
   },
   "keywords": [
     "openapi3"
@@ -26,7 +27,15 @@
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
     "firebase": "^7.17.1",
-    "firebase-admin": "^9.0.0"
+    "firebase-admin": "^9.0.0",
+    "body-parser": "^1.19.0",
+    "camelcase": "^6.0.0",
+    "cookie-parser": "^1.4.5",
+    "express-openapi-validator": "^3.16.7",
+    "ono": "^7.1.3",
+    "openapi-sampler": "1.0.0-beta.16",
+    "swagger-ui-express": "^4.1.4",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.4",
@@ -35,6 +44,18 @@
     "@babel/node": "^7.10.5",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "axios": "^0.19.2",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^7.6.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "mocha": "^8.1.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true
+    }
   }
 }

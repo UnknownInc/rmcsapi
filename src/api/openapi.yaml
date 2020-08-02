@@ -1,13 +1,13 @@
 openapi: 3.0.1
 info:
-  title: RMCS API
-  description: This is the API specification for RMCS.
-  termsOfService: https://api.rmcloudsoftware.com/terms/
   contact:
     email: rakesh@rareminds.in
+  description: This is the API specification for RMCS.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://api.rmcloudsoftware.com/terms/
+  title: RMCS API
   version: 1.0.0
 externalDocs:
   description: Find out more about Swagger
@@ -15,95 +15,146 @@ externalDocs:
 servers:
 - url: https://api.rmcloudsoftware.com/v1
 paths:
-  /{itemId}/likes:
+  /{itemId}/likes/widget:
     get:
-      tags:
-      - item
-      summary: Gets the count of the likes for the itemId
-      operationId: getLikes
+      operationId: getLikesWidget
       parameters:
-      - name: itemId
+      - explode: true
+        in: query
+        name: label
+        required: false
+        schema:
+          default: Likes
+          type: string
+        style: form
+      - explode: false
         in: path
+        name: itemId
         required: true
-        style: simple
-        explode: false
         schema:
           type: string
+        style: simple
       responses:
         "200":
-          description: successfully retrived the count of likes
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                example: <html></html>
+                type: string
+          description: successfully retrived the count of likes
         "404":
           description: Invalid itemId
         "500":
           description: Internal sever error
-      x-swagger-router-controller: Item
-    post:
+      summary: Gets widget to display the likes for the itemId
       tags:
       - item
-      summary: Update by Incrementing or Decrementing the count of the likes for the
-        itemId
-      operationId: updateLikes
+      x-eov-operation-handler: controllers/ItemController
+  /{itemId}/likes:
+    get:
+      operationId: getLikes
       parameters:
-      - name: itemId
+      - explode: false
         in: path
+        name: itemId
         required: true
-        style: simple
-        explode: false
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/body'
+        style: simple
       responses:
         "200":
-          description: successfully added to the count of likes
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_200'
+          description: successfully retrived the count of likes
+        "404":
+          description: Invalid itemId
+        "500":
+          description: Internal sever error
+      summary: Gets the count of the likes for the itemId
+      tags:
+      - item
+      x-eov-operation-handler: controllers/ItemController
+    post:
+      operationId: updateLikes
+      parameters:
+      - explode: false
+        in: path
+        name: itemId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          application/json:
+            schema:
+              properties:
+                op:
+                  enum:
+                  - inc
+                  - dec
+                  - reset
+                  type: string
+              type: object
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: successfully added to the count of likes
         "403":
           description: Access denied
         "404":
           description: Invalid itemId/op
         "500":
           description: Internal sever error
-      x-swagger-router-controller: Item
+      summary: Update by Incrementing or Decrementing the count of the likes for the
+        itemId
+      tags:
+      - item
+      x-eov-operation-handler: controllers/ItemController
 components:
+  requestBodies:
+    inline_object:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    NotFoundError:
+      description: Unable to reach/find the requested resource
   schemas:
     Context:
-      type: object
       properties:
         userhash:
-          type: integer
           format: string
+          type: integer
+      type: object
       xml:
         name: Context
     EmailCredentials:
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
       required:
       - email
       - password
       type: object
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
     User:
-      required:
-      - id
-      type: object
       properties:
         id:
-          type: string
           format: uuid
+          type: string
         email:
           type: string
         password:
@@ -117,36 +168,33 @@ components:
         phone:
           type: string
         userStatus:
-          type: integer
           description: User Status
           format: int32
+          type: integer
+      required:
+      - id
+      type: object
       xml:
         name: Use
     inline_response_200:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: count of the likes.
-          example: 1234
       example:
         count: 1234
-    body:
-      type: object
+      properties:
+        count:
+          description: count of the likes.
+          example: 1234
+          type: integer
+    inline_object:
       properties:
         op:
-          type: string
           enum:
           - inc
           - dec
           - reset
-  responses:
-    UnauthorizedError:
-      description: Access token is missing or invalid
-    NotFoundError:
-      description: Unable to reach/find the requested resource
+          type: string
+      type: object
   securitySchemes:
     bearerAuth:
-      type: http
-      scheme: bearer
       bearerFormat: JWT
+      scheme: bearer
+      type: http
