@@ -77,11 +77,17 @@ body { margin:0; padding: 0px;}
     lbDOM.onclick = function likeClick(){
       if (processing) return;
       processing=true;
+      var vt= window.localStorage.getItem('rv-${itemId}');
+      if (vt) {
+        processing=false;
+        return;
+      }
       lbDOM.style='pointer-events:none;opacity:0.5;transform:scale(0.8)';
       function reqListener () {
         try {
           var data=JSON.parse(this.responseText);
           lc.innerHTML=''+data.count;
+          window.localStorage.setItem('rv-${itemId}',''+Date.now())
         } catch (e) {
           console.error(e);
         } finally {
