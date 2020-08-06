@@ -20,7 +20,8 @@ const getLikes = async function ({ itemId }) {
     const item = itemSnapshot.data();
     if (item) { 
       return Service.successResponse({
-        count: item.likes
+        count: item.likes,
+        isActive: item.isActive
       });
     }
     return Service.rejectResponse(null,404)
@@ -70,7 +71,7 @@ body { margin:0; padding: 0px;}
 <div id='lb'>
 &nbsp;${icontag}${labeltag}<span id='lc'>${item.likes}</span>&nbsp;
 </div>
-<script>
+${item.isActive?`<script>
     var processing=false;
     var lbDOM = document.getElementById('lb');
     var lcDOM = document.getElementById('lc');
@@ -101,7 +102,7 @@ body { margin:0; padding: 0px;}
       oReq.setRequestHeader('Content-Type', 'application/json')
       oReq.send('{"op":"inc"}');
     }
-</script>
+</script>`:''}
 </body>
 </html>
 `);
@@ -126,6 +127,17 @@ const updateLikes = async function (data) {
     trace(`updating likes for ${itemId}`);
     const itemRef =  db().collection(ITEMS_COLLECTION).doc(itemId);
 
+    let itemSnapshot = await itemRef.get();
+    let item = itemSnapshot.data();
+    if (!item) {
+      return Service.rejectResponse(null, 404);
+    }
+    if (item.isActive==false){
+      return Service.successResponse({
+        count: item.likes,
+        isActive: item.isActive
+      });
+    }
     try {
       switch(body.op){
         case 'inc':
@@ -145,11 +157,12 @@ const updateLikes = async function (data) {
       return Service.rejectResponse(null, 404);
     }
 
-    const itemSnapshot = await itemRef.get();
-    const item = itemSnapshot.data();
+    itemSnapshot = await itemRef.get();
+    item = itemSnapshot.data();
     if (item) { 
       return Service.successResponse({
-        count: item.likes
+        count: item.likes,
+        isActive: item.isActive
       })
     }
     return Service.rejectResponse(null, 404);
